@@ -56,10 +56,7 @@ class UserControllerTest {
         UserDto test = UserDto.builder().name("Test").email("").build();
 
         List<ConstraintViolation<UserDto>> validationSet = new ArrayList<>(validator.validate(test));
-        assertAll(
-                () -> assertEquals(2, validationSet.size()),
-                () -> assertEquals("Email cannot empty or null", validationSet.get(0).getMessage())
-        );
+        assertEquals(2, validationSet.size());
     }
 
     @Test

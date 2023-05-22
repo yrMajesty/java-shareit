@@ -56,8 +56,8 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(value = OwnerItemException.class)
-    public ResponseEntity<Object> handleOwnerItemException(final OwnerItemException ex) {
+    @ExceptionHandler(value = UserException.class)
+    public ResponseEntity<Object> handleOwnerItemException(final UserException ex) {
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));

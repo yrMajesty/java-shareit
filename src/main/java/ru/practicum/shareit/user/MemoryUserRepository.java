@@ -1,7 +1,6 @@
-package ru.practicum.shareit.user.repository;
+package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -12,12 +11,10 @@ public class MemoryUserRepository {
     private final AtomicLong id = new AtomicLong(0);
 
     private final Map<Long, User> usersData = new HashMap<>();
-    private final Map<Long, String> emails = new HashMap<>();
 
     public User save(User user) {
         user.setId(id.incrementAndGet());
         usersData.put(user.getId(), user);
-        emails.put(user.getId(), user.getEmail());
 
         return user;
     }
@@ -28,13 +25,12 @@ public class MemoryUserRepository {
 
     public User updateById(User newUser, Long userId) {
         usersData.put(userId, newUser);
-        emails.put(userId, newUser.getEmail());
 
         return usersData.get(userId);
     }
 
     public boolean isExistEmail(String email) {
-        return emails.containsValue(email);
+        return usersData.values().stream().map(User::getEmail).anyMatch(email::equals);
     }
 
     public List<User> findAll() {
@@ -43,6 +39,5 @@ public class MemoryUserRepository {
 
     public void deleteById(Long id) {
         usersData.remove(id);
-        emails.remove(id);
     }
 }

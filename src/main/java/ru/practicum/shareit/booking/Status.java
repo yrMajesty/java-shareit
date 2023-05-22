@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.enums;
+package ru.practicum.shareit.booking;
 
 public enum Status {
     WAITING,

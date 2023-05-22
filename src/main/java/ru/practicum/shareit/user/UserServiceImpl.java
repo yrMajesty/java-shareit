@@ -1,13 +1,8 @@
-package ru.practicum.shareit.user.service.impl;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ExistEmailException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.MemoryUserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,13 +17,13 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto userDto) {
         checkExistEmail(userDto.getEmail());
 
-        User newUser = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userRepository.save(newUser));
+        User newUser = UserMapper.dtoToObject(userDto);
+        return UserMapper.objectToDto(userRepository.save(newUser));
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return UserMapper.toListUserDtos(userRepository.findAll());
+        return UserMapper.objectToDto(userRepository.findAll());
     }
 
     @Override
@@ -45,7 +40,7 @@ public class UserServiceImpl implements UserService {
             foundUser.setName(userDto.getName());
         }
 
-        return UserMapper.toUserDto(userRepository.updateById(foundUser, userId));
+        return UserMapper.objectToDto(userRepository.updateById(foundUser, userId));
     }
 
     @Override
@@ -53,7 +48,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("User with id='%S' not found", userId)));
 
-        return UserMapper.toUserDto(user);
+        return UserMapper.objectToDto(user);
     }
 
     @Override

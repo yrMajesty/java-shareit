@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import ru.practicum.shareit.user.User;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class ItemDto {
+public class ItemRequest {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty or null")

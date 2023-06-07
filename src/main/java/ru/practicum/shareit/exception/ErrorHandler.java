@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice
@@ -41,35 +40,32 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(value = NoSuchElementException.class)
-    public ResponseEntity<Object> handleNotFoundElementException(final NoSuchElementException ex) {
+    @ExceptionHandler(value = NoFoundObjectException.class)
+    public ResponseEntity<Object> handleNoFoundObjectException(final NoFoundObjectException ex) {
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         response.put("status", HttpStatus.NOT_FOUND.name());
         response.put("message", ex.getMessage());
 
-        log.error(ex.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(response);
     }
 
-    @ExceptionHandler(value = UserException.class)
-    public ResponseEntity<Object> handleOwnerItemException(final UserException ex) {
+    @ExceptionHandler(value = AccessException.class)
+    public ResponseEntity<Object> handleAccessException(final AccessException ex) {
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         response.put("status", HttpStatus.FORBIDDEN.name());
         response.put("message", ex.getMessage());
 
-        log.error(ex.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(response);
     }
+
 
     @ExceptionHandler(value = ExistEmailException.class)
     public ResponseEntity<Object> handleExistEmailException(final ExistEmailException ex) {
@@ -79,13 +75,23 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         response.put("status", HttpStatus.CONFLICT.name());
         response.put("message", ex.getMessage());
 
-        log.error(ex.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(response);
     }
 
+    @ExceptionHandler(value = {NoCorrectRequestException.class})
+    public ResponseEntity<Object> handleNoCorrectRequestException(final RuntimeException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        response.put("status", HttpStatus.BAD_REQUEST.name());
+        response.put("error", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<Object> handleException(final Exception ex) {
@@ -94,8 +100,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         response.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.name());
         response.put("message", "Непредвиденная ошибка: " + ex.getMessage());
-
-        log.error(ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

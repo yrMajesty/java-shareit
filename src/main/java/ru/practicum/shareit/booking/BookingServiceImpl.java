@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -99,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerId(userId, sortBy);
                 break;
             case PAST:
-                bookingList =  bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sortBy);
+                bookingList = bookingRepository.findAllByBookerIdAndEndIsBefore(userId, LocalDateTime.now(), sortBy);
                 break;
             case FUTURE:
                 bookingList = bookingRepository.findAllByBookerIdAndStartIsAfter(userId, LocalDateTime.now(), sortBy);
@@ -108,7 +109,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfter(userId, LocalDateTime.now(), LocalDateTime.now(), sortBy);
                 break;
             case WAITING:
-                bookingList =  bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, sortBy);
+                bookingList = bookingRepository.findAllByBookerIdAndStatus(userId, Status.WAITING, sortBy);
                 break;
             case REJECTED:
                 bookingList = bookingRepository.findAllByBookerIdAndStatus(userId, Status.REJECTED, sortBy);

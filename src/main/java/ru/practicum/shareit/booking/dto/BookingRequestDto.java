@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingRequest {
+public class BookingRequestDto {
 
     @NotNull(message = "ItemId cannot be empty or null")
     private Long itemId;

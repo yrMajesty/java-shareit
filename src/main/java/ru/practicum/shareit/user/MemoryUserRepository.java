@@ -1,8 +1,7 @@
-package ru.practicum.shareit.user.repository;
+package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ExistEmailException;
-import ru.practicum.shareit.user.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

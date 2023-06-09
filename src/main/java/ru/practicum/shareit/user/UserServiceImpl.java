@@ -1,14 +1,11 @@
-package ru.practicum.shareit.user.service;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NoFoundObjectException;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dto.UserRequest;
-import ru.practicum.shareit.user.dto.UserResponse;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,19 +17,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse createUser(UserRequest userRequest) {
-        User newUser = UserMapper.dtoToObject(userRequest);
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        User newUser = UserMapper.dtoToObject(userRequestDto);
         return UserMapper.objectToDto(userRepository.save(newUser));
     }
 
     @Override
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return UserMapper.objectToDto(userRepository.findAll());
     }
 
     @Override
     @Transactional
-    public UserResponse updateUserById(UserRequest request, Long userId) {
+    public UserResponseDto updateUserById(UserRequestDto request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoFoundObjectException(String.format("User with id='%s' not found", userId)));
 
@@ -50,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoFoundObjectException(String.format("User with id='%s' not found", userId)));
 

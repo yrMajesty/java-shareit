@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class ItemRequest {
+public class ItemRequestDto {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty or null")

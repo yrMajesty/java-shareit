@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class ItemResponse {
+public class ItemResponseDto {
     private Long id;
 
     private String name;

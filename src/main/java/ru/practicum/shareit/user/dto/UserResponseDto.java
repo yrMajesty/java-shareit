@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class UserResponse {
+public class UserResponseDto {
     private Long id;
 
     private String name;

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class UserRequest {
+public class UserRequestDto {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty or null")

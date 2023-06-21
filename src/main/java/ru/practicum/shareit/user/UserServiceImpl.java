@@ -2,51 +2,54 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ExistEmailException;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.NoFoundObjectException;
+import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final MemoryUserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public UserDto create(UserDto userDto) {
-        checkExistEmail(userDto.getEmail());
-
-        User newUser = UserMapper.dtoToObject(userDto);
+    @Transactional
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        User newUser = UserMapper.dtoToObject(userRequestDto);
         return UserMapper.objectToDto(userRepository.save(newUser));
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return UserMapper.objectToDto(userRepository.findAll());
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto, Long userId) {
-        User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("User with id='%S' not found", userId)));
+    @Transactional
+    public UserResponseDto updateUserById(UserRequestDto request, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoFoundObjectException(String.format("User with id='%s' not found", userId)));
 
-        if (userDto.getEmail() != null && !Objects.equals(userDto.getEmail(), foundUser.getEmail())) {
-            checkExistEmail(userDto.getEmail());
-            foundUser.setEmail(userDto.getEmail());
+        if (request.getEmail() != null && !Objects.equals(request.getEmail(), user.getEmail())) {
+            user.setEmail(request.getEmail());
         }
 
-        if (userDto.getName() != null) {
-            foundUser.setName(userDto.getName());
+        if (request.getName() != null) {
+            user.setName(request.getName());
         }
 
-        return UserMapper.objectToDto(userRepository.updateById(foundUser, userId));
+        User savedUser = userRepository.save(user);
+
+        return UserMapper.objectToDto(savedUser);
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public UserResponseDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("User with id='%S' not found", userId)));
+                .orElseThrow(() -> new NoFoundObjectException(String.format("User with id='%s' not found", userId)));
 
         return UserMapper.objectToDto(user);
     }
@@ -54,18 +57,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(String.format("User with id='%S' not found", userId)));
+                .orElseThrow(() -> new NoFoundObjectException(String.format("User with id='%s' not found", userId)));
     }
 
     @Override
+    public void checkExistUserById(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NoFoundObjectException(String.format("User with id='%s' not found", userId));
+        }
+    }
+
+    @Override
+    @Transactional
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
-    private void checkExistEmail(String email) {
-        if (userRepository.isExistEmail(email)) {
-            String error = String.format("Email %s already exist", email);
-            throw new ExistEmailException(error);
-        }
-    }
 }

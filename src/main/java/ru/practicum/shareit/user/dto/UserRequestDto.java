@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class UserDto {
+public class UserRequestDto {
     private Long id;
 
     @NotBlank(message = "Name cannot be empty or null")

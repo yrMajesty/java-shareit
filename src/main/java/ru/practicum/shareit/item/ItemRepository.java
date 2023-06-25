@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -16,4 +17,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOwnerId(Long id);
 
+    List<Item> findAllByRequestIdIn(Set<Long> ids);
+
+    Item findByRequestId(Long requestId);
 }

@@ -25,5 +25,5 @@ public class ItemRequestDto {
 
     private User owner;
 
-    private Long request;
+    private Long requestId;
 }

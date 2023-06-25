@@ -13,12 +13,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment save(Comment comment) {
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
     }
 
     @Override
-    public List<CommentResponse> findAllByItemId(Long id) {
+    public List<CommentResponseDto> getAllCommentsByItemId(Long id) {
         List<Comment> comments = commentRepository.findAllByItemId(id);
 
         return CommentMapper.objectsToDto(comments);

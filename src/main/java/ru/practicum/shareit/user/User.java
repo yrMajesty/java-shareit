@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,4 +22,3 @@ public class User {
     @Column(unique = true)
     private String email;
 }
-

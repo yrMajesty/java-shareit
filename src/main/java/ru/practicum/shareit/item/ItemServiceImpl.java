@@ -14,12 +14,14 @@ import ru.practicum.shareit.exception.NoFoundObjectException;
 import ru.practicum.shareit.item.comment.*;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,8 @@ public class ItemServiceImpl implements ItemService {
     private final CommentService commentService;
     private final BookingRepository bookingRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Override
     @Transactional
     public ItemResponseDto createItem(ItemRequestDto request, Long userId) {
@@ -38,8 +42,13 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.dtoToObject(request);
         item.setOwner(user);
 
+        if (request.getRequestId() != null) {
+            item.setRequest(itemRequestRepository
+                    .findById(request.getRequestId()).orElse(null));
+        }
+
         Item savedItem = itemRepository.save(item);
-        return ItemMapper.objectToDto(savedItem);
+        return ItemMapper.objectToItemResponseDto(savedItem);
     }
 
     @Override
@@ -47,23 +56,21 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NoFoundObjectException(String.format("Item with id='%s' not found", itemId)));
 
-        ItemResponseDto itemResponseDto = ItemMapper.objectToDto(item);
+        ItemResponseDto itemResponseDto = ItemMapper.objectToItemResponseDto(item);
 
         if (Objects.equals(userId, item.getOwner().getId())) {
             itemResponseDto.setNextBooking(
                     (bookingRepository
-                            .findNextBooking(itemId, userId, Status.APPROVED, LocalDateTime.now(),
-                                    PageRequest.of(0, 1)))
+                            .findNextBooking(itemId, userId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1)))
                             .get().findFirst().orElse(null));
 
             itemResponseDto.setLastBooking(
                     (bookingRepository
-                            .findLastBooking(itemId, userId, Status.APPROVED, LocalDateTime.now(),
-                                    PageRequest.of(0, 1)))
+                            .findLastBooking(itemId, userId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1)))
                             .get().findFirst().orElse(null));
         }
 
-        List<CommentResponse> comments = commentService.findAllByItemId(itemId);
+        List<CommentResponseDto> comments = commentService.getAllCommentsByItemId(itemId);
         itemResponseDto.setComments(comments);
 
         return itemResponseDto;
@@ -92,29 +99,27 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item savedItem = itemRepository.save(item);
-        return ItemMapper.objectToDto(savedItem);
+        return ItemMapper.objectToItemResponseDto(savedItem);
     }
 
     @Override
-    public List<ItemResponseDto> getAllByUserId(Long userId) {
+    public List<ItemResponseDto> getAllItemsByUserId(Long userId) {
         userService.checkExistUserById(userId);
 
         List<Item> items = itemRepository.findAllByOwnerId(userId);
-        List<ItemResponseDto> itemResponseDtos = ItemMapper.objectToDto(items);
+        List<ItemResponseDto> itemResponseDtos = ItemMapper.objectToItemResponseDto(items);
 
         return itemResponseDtos
                 .stream()
                 .peek(itemsDto -> {
                     itemsDto.setNextBooking(
                             (bookingRepository
-                                    .findNextBooking(itemsDto.getId(), userId, Status.APPROVED, LocalDateTime.now(),
-                                            PageRequest.of(0, 1)))
+                                    .findNextBooking(itemsDto.getId(), userId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1)))
                                     .get().findFirst().orElse(null));
 
                     itemsDto.setLastBooking(
                             (bookingRepository
-                                    .findLastBooking(itemsDto.getId(), userId, Status.APPROVED, LocalDateTime.now(),
-                                            PageRequest.of(0, 1)))
+                                    .findLastBooking(itemsDto.getId(), userId, Status.APPROVED, LocalDateTime.now(), PageRequest.of(0, 1)))
                                     .get().findFirst().orElse(null));
                 })
                 .collect(Collectors.toList());
@@ -126,12 +131,12 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
         List<Item> items = itemRepository.findByText(text);
-        return ItemMapper.objectToDto(items);
+        return ItemMapper.objectToItemResponseDto(items);
     }
 
     @Override
     @Transactional
-    public CommentResponse createComment(CommentRequest request, Long userId, Long itemId) {
+    public CommentResponseDto createComment(CommentRequestDto request, Long userId, Long itemId) {
         Comment comment = CommentMapper.dtoToObject(request);
 
         User author = userService.findUserById(userId);
@@ -150,8 +155,18 @@ public class ItemServiceImpl implements ItemService {
 
         comment.setAuthor(author);
         comment.setItem(item);
-        Comment savedComment = commentService.save(comment);
+        Comment savedComment = commentService.createComment(comment);
 
         return CommentMapper.dtoToObject(savedComment);
+    }
+
+    @Override
+    public List<Item> getAllByRequestIds(Set<Long> ids) {
+        return itemRepository.findAllByRequestIdIn(ids);
+    }
+
+    @Override
+    public Item getItemByRequestId(Long requestId) {
+        return itemRepository.findByRequestId(requestId);
     }
 }

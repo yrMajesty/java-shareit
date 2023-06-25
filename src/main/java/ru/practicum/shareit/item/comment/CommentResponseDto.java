@@ -2,14 +2,17 @@ package ru.practicum.shareit.item.comment;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class CommentRequest {
-    @NotBlank(message = "Text cannot be null")
+public class CommentResponseDto {
+    private Long id;
     private String text;
+    private String authorName;
+    private LocalDateTime created;
 }
+

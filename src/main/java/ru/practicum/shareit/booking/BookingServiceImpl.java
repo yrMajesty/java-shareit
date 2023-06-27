@@ -84,14 +84,15 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NoFoundObjectException(
                         String.format("Booking with id='%s' not found", bookingId)));
 
-        UserResponseDto user = userService.getUserById(userId);
+        userService.checkExistUserById(userId);
+        UserResponseDto booker = userService.getUserById(booking.getBooker().getId());
 
         if (!Objects.equals(booking.getBooker().getId(), userId)
                 && !Objects.equals(booking.getItem().getOwner().getId(), userId)) {
             throw new NoFoundObjectException(String.format("Only booker or item owner can get booking with id='%s'",
                     bookingId));
         }
-        booking.setBooker(UserMapper.dtoToObject(user));
+        booking.setBooker(UserMapper.dtoToObject(booker));
 
         return BookingMapper.objectToDto(booking);
     }
@@ -149,8 +150,8 @@ public class BookingServiceImpl implements BookingService {
                 return BookingMapper.objectToDto(bookingRepository
                         .findByItemIdInAndStartIsBeforeAndEndIsAfter(itemIdList, dateTimeNow, dateTimeNow, pageable));
             case PAST:
-                return BookingMapper.objectToDto(bookingRepository.
-                        findByItemIdInAndEndIsBefore(itemIdList, dateTimeNow, pageable));
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByItemIdInAndEndIsBefore(itemIdList, dateTimeNow, pageable));
             case FUTURE:
                 return BookingMapper.objectToDto(bookingRepository
                         .findByItemIdInAndStartIsAfter(itemIdList, dateTimeNow, pageable));

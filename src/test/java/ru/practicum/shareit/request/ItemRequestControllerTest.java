@@ -185,7 +185,7 @@ class ItemRequestControllerTest {
                 .items(List.of(itemDto))
                 .build();
 
-        when(itemRequestService.getRequestByUserId(anyLong(), anyLong()))
+        when(itemRequestService.getRequestById(anyLong(), anyLong()))
                 .thenReturn(response);
 
         mvc.perform(get("/requests/1")
@@ -201,7 +201,7 @@ class ItemRequestControllerTest {
     void getRequestByUser_statusNotFound_userDoesNotExist() throws Exception {
         doThrow(NoFoundObjectException.class)
                 .when(itemRequestService)
-                .getRequestByUserId(anyLong(), anyLong());
+                .getRequestById(anyLong(), anyLong());
 
         mvc.perform(get("/requests/1")
                         .header(userIdHeader, 1))

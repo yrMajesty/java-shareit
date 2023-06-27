@@ -28,12 +28,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemService itemService;
 
     @Override
-    public ItemRequest getRequestById(Long id) {
-        return itemRequestRepository.findById(id)
-                .orElseThrow(() -> new NoFoundObjectException(String.format("ItemRequest with id='%s' not found", id)));
-    }
-
-    @Override
     public RequestDto createRequest(RequestDto request, Long userId) {
         User user = userService.findUserById(userId);
 
@@ -67,10 +61,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public RequestDto getRequestByUserId(Long userId, Long requestId) {
+    public RequestDto getRequestById(Long userId, Long requestId) {
         userService.checkExistUserById(userId);
 
-        ItemRequest itemRequest = getRequestById(requestId);
+        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(
+                () -> new NoFoundObjectException(String.format("ItemRequest with id='%s' not found", requestId)));
 
         Item item = itemService.getItemByRequestId(requestId);
 

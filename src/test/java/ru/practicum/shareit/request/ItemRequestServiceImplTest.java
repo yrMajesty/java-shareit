@@ -63,10 +63,18 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getRequestById_correctUser_requestIsExist() {
-        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.ofNullable(itemRequest));
+    void getRequestById_correctRequest_requestIsExist() {
+        doNothing()
+                .when(userService)
+                .checkExistUserById(anyLong());
 
-        ItemRequest result = underTest.getRequestById(1L);
+        when(itemRequestRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(itemRequest));
+
+        when(itemService.getItemByRequestId(anyLong()))
+                .thenReturn(item);
+
+        RequestDto result = underTest.getRequestById(1L, 1L);
 
         verify(itemRequestRepository, times(1)).findById(anyLong());
 
@@ -76,10 +84,14 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getRequestById_notFoundObjectException_requestIdIsIncorrect() {
+        doNothing()
+                .when(userService)
+                .checkExistUserById(anyLong());
+
         doThrow(NoFoundObjectException.class)
                 .when(itemRequestRepository).findById(anyLong());
 
-        assertThrows(NoFoundObjectException.class, () -> underTest.getRequestById(100L));
+        assertThrows(NoFoundObjectException.class, () -> underTest.getRequestById(100L, 1L));
     }
 
     @Test
@@ -138,7 +150,7 @@ class ItemRequestServiceImplTest {
         when(itemService.getItemByRequestId(anyLong()))
                 .thenReturn(item);
 
-        underTest.getRequestByUserId(2L, 10L);
+        underTest.getRequestById(2L, 10L);
 
         verify(itemRequestRepository, times(1)).findById(anyLong());
     }
@@ -148,7 +160,7 @@ class ItemRequestServiceImplTest {
         doThrow(NoFoundObjectException.class)
                 .when(userService).checkExistUserById(anyLong());
 
-        assertThrows(NoFoundObjectException.class, () -> underTest.getRequestByUserId(100L, 1L));
+        assertThrows(NoFoundObjectException.class, () -> underTest.getRequestById(100L, 1L));
     }
 
     @Test

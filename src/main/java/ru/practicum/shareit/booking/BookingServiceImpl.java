@@ -14,7 +14,9 @@ import ru.practicum.shareit.exception.NoValidArgumentException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,11 +81,17 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto getBookingById(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NoFoundObjectException(String.format("Booking with id='%s' not found", bookingId)));
+                .orElseThrow(() -> new NoFoundObjectException(
+                        String.format("Booking with id='%s' not found", bookingId)));
 
-        if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(booking.getItem().getOwner().getId(), userId)) {
-            throw new NoFoundObjectException(String.format("Only booker or item owner can get booking with id='%s'", bookingId));
+        UserResponseDto user = userService.getUserById(userId);
+
+        if (!Objects.equals(booking.getBooker().getId(), userId)
+                && !Objects.equals(booking.getItem().getOwner().getId(), userId)) {
+            throw new NoFoundObjectException(String.format("Only booker or item owner can get booking with id='%s'",
+                    bookingId));
         }
+        booking.setBooker(UserMapper.dtoToObject(user));
 
         return BookingMapper.objectToDto(booking);
     }
@@ -92,80 +100,81 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingResponseDto> getAllByBookerId(Long userId, String state, Integer from, Integer size) {
         userService.checkExistUserById(userId);
 
-        if (from < 0 || size <= 0) {
-            throw new NoValidArgumentException("The request parameters from b size are invalid and cannot be negative");
-        }
-
-        int page = from == 0 ? 0 : (from / size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
+        Pageable pageable = getPageable(from, size);
 
         State bookingState = State.from(state)
                 .orElseThrow(() -> new NoCorrectRequestException("Unknown state: " + state));
 
-        LocalDateTime dateNow = LocalDateTime.now();
+        LocalDateTime dateTimeNow = LocalDateTime.now();
 
-        List<Booking> bookings;
         switch (bookingState) {
             case CURRENT:
-                bookings = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId, dateNow, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByBookerIdAndStartIsBeforeAndEndIsAfter(userId, dateTimeNow, dateTimeNow, pageable));
             case PAST:
-                bookings = bookingRepository.findByBookerIdAndEndIsBefore(userId, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByBookerIdAndEndIsBefore(userId, dateTimeNow, pageable));
             case FUTURE:
-                bookings = bookingRepository.findByBookerIdAndStartIsAfter(userId, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByBookerIdAndStartIsAfter(userId, dateTimeNow, pageable));
             case WAITING:
-                bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, dateNow, Status.WAITING, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByBookerIdAndStartIsAfterAndStatusIs(userId, dateTimeNow, Status.WAITING, pageable));
             case REJECTED:
-                bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, dateNow, Status.REJECTED, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByBookerIdAndStartIsAfterAndStatusIs(userId, dateTimeNow, Status.REJECTED, pageable));
             default:
-                bookings = bookingRepository.findAllByBookerId(userId, pageable);
+                return BookingMapper.objectToDto(bookingRepository.findAllByBookerId(userId, pageable));
         }
-
-        return BookingMapper.objectToDto(bookings);
     }
 
     @Override
     public List<BookingResponseDto> getAllByOwnerId(Long userId, String state, Integer from, Integer size) {
         User user = userService.findUserById(userId);
 
-        if (from < 0 || size <= 0) {
-            throw new NoValidArgumentException("The request parameters from b size are invalid and cannot be negative");
-        }
+        Pageable pageable = getPageable(from, size);
 
-        LocalDateTime dateNow = LocalDateTime.now();
-        int page = from == 0 ? 0 : (from / size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("start").descending());
         State bookingState = State.from(state)
                 .orElseThrow(() -> new NoCorrectRequestException("Unknown state: " + state));
+
         List<Long> itemIdList = itemRepository.findAllByOwnerId(user.getId())
                 .stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
 
-        List<Booking> bookings;
+        LocalDateTime dateTimeNow = LocalDateTime.now();
+
         switch (bookingState) {
             case CURRENT:
-                bookings = bookingRepository.findByItemIdInAndStartIsBeforeAndEndIsAfter(itemIdList, dateNow, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByItemIdInAndStartIsBeforeAndEndIsAfter(itemIdList, dateTimeNow, dateTimeNow, pageable));
             case PAST:
-                bookings = bookingRepository.findByItemIdInAndEndIsBefore(itemIdList, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository.
+                        findByItemIdInAndEndIsBefore(itemIdList, dateTimeNow, pageable));
             case FUTURE:
-                bookings = bookingRepository.findByItemIdInAndStartIsAfter(itemIdList, dateNow, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByItemIdInAndStartIsAfter(itemIdList, dateTimeNow, pageable));
             case WAITING:
-                bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, dateNow, Status.WAITING, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, dateTimeNow, Status.WAITING, pageable));
             case REJECTED:
-                bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, dateNow, Status.REJECTED, pageable);
-                break;
+                return BookingMapper.objectToDto(bookingRepository
+                        .findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, dateTimeNow, Status.REJECTED, pageable));
             default:
-                bookings = bookingRepository.findAllByItemIdIn(itemIdList, pageable);
+                return BookingMapper.objectToDto(bookingRepository.findAllByItemIdIn(itemIdList, pageable));
         }
-        return BookingMapper.objectToDto(bookings);
+    }
+
+    private Pageable getPageable(Integer from, Integer size) {
+        validatePageableParameters(from, size);
+
+        int page = from == 0 ? 0 : (from / size);
+        return PageRequest.of(page, size, Sort.by("start").descending());
+    }
+
+    private void validatePageableParameters(Integer from, Integer size) {
+        if (from < 0 || size <= 0) {
+            throw new NoValidArgumentException("The request parameters from b size are invalid and cannot be negative");
+        }
     }
 }

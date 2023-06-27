@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -24,7 +25,7 @@ class ItemRepositoryTest {
 
     @Test
     void findByText_notEmptyOptional_itemExist() {
-        List<Item> results = itemRepository.findByText("book");
+        List<Item> results = itemRepository.findByText("book", PageRequest.of(0, 20));
 
         assertFalse(results.isEmpty());
         assertThat(results.get(0).getName()).isEqualTo("Book");
@@ -33,7 +34,7 @@ class ItemRepositoryTest {
 
     @Test
     void findAllByOwnerId_notEmptyList_itemsExist() {
-        List<Item> results = itemRepository.findAllByOwnerId(1L);
+        List<Item> results = itemRepository.findAllByOwnerId(1L, PageRequest.of(0, 20));
 
         assertFalse(results.isEmpty());
         assertThat(results.get(0).getName()).isEqualTo("Book");

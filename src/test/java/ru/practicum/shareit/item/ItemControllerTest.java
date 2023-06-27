@@ -135,7 +135,7 @@ class ItemControllerTest {
 
     @Test
     void getAllItemsByUserId_statusOk_userExistAndItemsDoNotExist() throws Exception {
-        when(itemService.getAllItemsByUserId(anyLong()))
+        when(itemService.getAllItemsByUserId(anyLong(), any(), any()))
                 .thenReturn(List.of());
 
         mvc.perform(MockMvcRequestBuilders.get("/items")
@@ -149,7 +149,7 @@ class ItemControllerTest {
     void getAllItemsByUserId_statusNotFound_userDoesNotExist() throws Exception {
         doThrow(NoFoundObjectException.class)
                 .when(itemService)
-                .getAllItemsByUserId(anyLong());
+                .getAllItemsByUserId(anyLong(), any(), any());
 
         mvc.perform(MockMvcRequestBuilders.get("/items")
                         .header(userIdHeader, 1))
@@ -289,7 +289,7 @@ class ItemControllerTest {
 
     @Test
     void searchByText_statusOk_textIsNotEmpty() throws Exception {
-        when(itemService.searchItemByText(anyString()))
+        when(itemService.searchItemByText(anyString(), any(), any()))
                 .thenReturn(List.of());
 
         mvc.perform(MockMvcRequestBuilders.get("/items/search")
@@ -307,7 +307,7 @@ class ItemControllerTest {
                 .description("Good old book")
                 .build();
 
-        when(itemService.searchItemByText(anyString()))
+        when(itemService.searchItemByText(anyString(), any(), any()))
                 .thenReturn(List.of(itemResponse));
 
         mvc.perform(MockMvcRequestBuilders.get("/items/search")

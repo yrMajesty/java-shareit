@@ -28,9 +28,9 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public RequestDto getRequestByUser(@RequestHeader(name = USER_ID_HEADER) Long userId,
+    public RequestDto getRequest(@RequestHeader(name = USER_ID_HEADER) Long userId,
                                        @PathVariable(name = "requestId") Long requestId) {
-        return itemRequestService.getRequestByUserId(userId, requestId);
+        return itemRequestService.getRequestById(userId, requestId);
     }
 
     @GetMapping("/all")

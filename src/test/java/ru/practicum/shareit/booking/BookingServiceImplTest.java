@@ -17,6 +17,7 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserResponseDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -227,6 +228,9 @@ class BookingServiceImplTest {
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(booking));
 
+        when(userService.getUserById(anyLong()))
+                .thenReturn(UserResponseDto.builder().id(1L).name("Nikita").email("nikita@mail.ru").build());
+
         underTest.getBookingById(1L, 1L);
 
         verify(bookingRepository, times(1)).findById(anyLong());
@@ -405,7 +409,7 @@ class BookingServiceImplTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(user);
 
-        when(itemRepository.findAllByOwnerId(anyLong()))
+        when(itemRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(item));
 
 
@@ -425,7 +429,7 @@ class BookingServiceImplTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(user);
 
-        when(itemRepository.findAllByOwnerId(anyLong()))
+        when(itemRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(item));
 
 
@@ -444,7 +448,7 @@ class BookingServiceImplTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(user);
 
-        when(itemRepository.findAllByOwnerId(anyLong()))
+        when(itemRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(item));
 
 
@@ -463,7 +467,7 @@ class BookingServiceImplTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(user);
 
-        when(itemRepository.findAllByOwnerId(anyLong()))
+        when(itemRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(item));
 
 
@@ -483,7 +487,7 @@ class BookingServiceImplTest {
         when(userService.findUserById(anyLong()))
                 .thenReturn(user);
 
-        when(itemRepository.findAllByOwnerId(anyLong()))
+        when(itemRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(item));
 
 

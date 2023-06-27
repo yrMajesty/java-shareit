@@ -18,8 +18,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemResponseDto> getAllItemsByUserId(@RequestHeader(name = USER_ID_HEADER) Long userId) {
-        return itemService.getAllItemsByUserId(userId);
+    public List<ItemResponseDto> getAllItemsByUserId(@RequestHeader(name = USER_ID_HEADER) Long userId,
+                                                     @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                     @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemService.getAllItemsByUserId(userId, from, size);
     }
 
     @PostMapping
@@ -42,8 +44,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemResponseDto> searchByText(@RequestParam(name = "text") String text) {
-        return itemService.searchItemByText(text);
+    public List<ItemResponseDto> searchByText(@RequestParam(name = "text") String text,
+                                              @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                              @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return itemService.searchItemByText(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

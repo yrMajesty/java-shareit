@@ -18,6 +18,7 @@ public class BookingMapper {
 
         UserDto booker = UserDto.builder()
                 .id(booking.getBooker().getId())
+                .name(booking.getBooker().getName())
                 .build();
 
         return BookingResponseDto.builder()

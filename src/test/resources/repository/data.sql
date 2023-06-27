@@ -16,3 +16,8 @@ INSERT INTO items (name, description, is_available, owner_id, request_id) VALUES
 INSERT INTO comments (text, item_id, author_id, created) VALUES
     ('super interesting good book', 1, 3, '2023-06-25T10:10:30');
 
+INSERT INTO bookings (item_id, start_date, end_date, booker_id, status) VALUES
+    (1,  '2023-06-10T10:13:30', '2023-06-20T10:13:30', 3,'APPROVED');
+
+INSERT INTO bookings (item_id, start_date, end_date, booker_id, status) VALUES
+    (2,  '2023-06-10T10:13:30', '2023-06-20T10:13:30', 3,'APPROVED');

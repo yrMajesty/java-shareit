@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
+import ru.practicum.shareit.booking.constraint.EndDateIsAfterStartDate;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
@@ -12,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EndDateIsAfterStartDate
 public class BookingRequestDto {
-
     @NotNull(message = "ItemId cannot be empty or null")
     private Long itemId;
 

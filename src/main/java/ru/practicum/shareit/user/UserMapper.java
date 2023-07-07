@@ -23,6 +23,14 @@ public class UserMapper {
                 .build();
     }
 
+    public static User dtoToObject(UserResponseDto userDto) {
+        return User.builder()
+                .id(userDto.getId())
+                .email(userDto.getEmail())
+                .name(userDto.getName())
+                .build();
+    }
+
     public static List<UserResponseDto> objectToDto(List<User> users) {
         return users.stream()
                 .map(UserMapper::objectToDto)
